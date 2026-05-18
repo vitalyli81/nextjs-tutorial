@@ -19,13 +19,12 @@
 
 import { useState } from "react";
 
-export function Counter({
-  label,
-  initialCount = 0,
-}: {
+interface CounterProps {
   label: string;
   initialCount?: number; // optional — server can pass a computed starting value
-}) {
+}
+
+export function Counter({ label, initialCount = 0 }: CounterProps) {
   // useState initialises with the server-provided value.
   // After hydration, state lives entirely on the client — the server is no longer involved.
   const [count, setCount] = useState(initialCount);

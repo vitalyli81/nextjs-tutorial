@@ -10,10 +10,10 @@
 //   <Callout kind="tip">Add loading.tsx to enable partial prefetch.</Callout>
 //   <Callout kind="warning">await searchParams — it's a Promise in Next.js 15.</Callout>
 
-type CalloutProps = {
+interface CalloutProps {
   children: React.ReactNode;
   kind?: "rule" | "tip" | "warning";
-};
+}
 
 // Tailwind class sets per variant — border + background + text colour
 const styles = {

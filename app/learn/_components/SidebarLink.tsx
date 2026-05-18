@@ -15,13 +15,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function SidebarLink({
-  href,
-  children,
-}: {
+interface SidebarLinkProps {
   href: string;
   children: React.ReactNode;
-}) {
+}
+
+export function SidebarLink({ href, children }: SidebarLinkProps) {
   // usePathname() returns the current URL path, e.g. "/learn/fetching-data"
   // It re-renders this component whenever the route changes.
   const pathname = usePathname();

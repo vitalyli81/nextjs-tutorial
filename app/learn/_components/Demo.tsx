@@ -11,17 +11,15 @@
 // This is a Server Component — no "use client" is needed because it has no
 // state or event handlers. Its children can be Server OR Client Components.
 
-export function Demo({
-  title,
-  concept,
-  children,
-}: {
+interface DemoProps {
   // concept: the exact Next.js symbol being shown, e.g. "layout.tsx", "useRouter"
   concept: string;
   // title: one sentence explaining what the demo illustrates
   title: string;
   children: React.ReactNode;
-}) {
+}
+
+export function Demo({ title, concept, children }: DemoProps) {
   return (
     <section className="rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
       {/* Header band ─ concept tag + human-readable title */}

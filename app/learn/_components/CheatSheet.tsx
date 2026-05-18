@@ -4,10 +4,10 @@
 //   items  — the bullet list of facts
 //   title  — optional override (defaults to "Chapter Cheat Sheet")
 
-type CheatSheetProps = {
+interface CheatSheetProps {
   items: string[];
   title?: string;
-};
+}
 
 export function CheatSheet({ items, title = "Chapter Cheat Sheet" }: CheatSheetProps) {
   return (

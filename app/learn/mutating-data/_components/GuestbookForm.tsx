@@ -23,7 +23,11 @@
 import { useActionState } from "react";
 import { addEntry, type GuestbookState } from "../_actions/guestbook";
 
-export function GuestbookForm({ initial }: { initial: GuestbookState }) {
+interface GuestbookFormProps {
+  initial: GuestbookState;
+}
+
+export function GuestbookForm({ initial }: GuestbookFormProps) {
   // useActionState wires the server action to this component.
   // initial — loaded by the parent Server Component and passed as a prop.
   const [state, action, pending] = useActionState(addEntry, initial);

@@ -1,3 +1,8 @@
+// /learn index page — Server Component.
+// Renders the chapter grid by mapping over the shared `chapters` array from
+// _data/chapters.ts. Each card links to the corresponding chapter route.
+// No client JavaScript needed — pure server-rendered navigation.
+
 import Link from "next/link";
 import { chapters } from "./_data/chapters";
 
@@ -8,6 +13,8 @@ export default function LearnIndex() {
       <p className="text-zinc-500 dark:text-zinc-400 mb-8">
         Every concept from the official getting-started docs, demonstrated live. Pick a chapter.
       </p>
+
+      {/* Chapter grid — two columns on small+ screens */}
       <ul className="grid gap-3 sm:grid-cols-2">
         {chapters.map((ch) => (
           <li key={ch.slug}>

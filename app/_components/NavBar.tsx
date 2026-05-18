@@ -50,6 +50,7 @@ const chapters = [
   { slug: "metadata",             title: "10. Metadata"          },
   { slug: "state-management",     title: "11. State Management"  },
   { slug: "tailwind-css",         title: "12. Tailwind CSS"      },
+  { slug: "typescript",           title: "13. TypeScript"        },
 ];
 
 const apps = [

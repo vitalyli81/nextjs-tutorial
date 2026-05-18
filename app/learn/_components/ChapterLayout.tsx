@@ -17,14 +17,14 @@
 import Link from "next/link";
 import { chapters } from "../_data/chapters";
 
-type Props = {
+interface ChapterLayoutProps {
   slug: string;         // must match a slug in _data/chapters.ts
   title: string;        // displayed in the <h1>
   docsHref: string;     // full URL to the official Next.js docs page
   children: React.ReactNode;
-};
+}
 
-export function ChapterLayout({ slug, title, docsHref, children }: Props) {
+export function ChapterLayout({ slug, title, docsHref, children }: ChapterLayoutProps) {
   // Find this chapter's position so we can display "Chapter N" and compute
   // prev / next links automatically from the shared chapters array.
   const idx = chapters.findIndex((c) => c.slug === slug);

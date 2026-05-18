@@ -13,7 +13,11 @@
 // Tip: use a template literal (backticks) so you can write multi-line strings
 // without escaping anything.
 
-export function CodeBlock({ children }: { children: React.ReactNode }) {
+interface CodeBlockProps {
+  children: React.ReactNode;
+}
+
+export function CodeBlock({ children }: CodeBlockProps) {
   return (
     // overflow-x-auto: wide snippets scroll horizontally instead of wrapping
     // leading-relaxed: extra line-height makes dense code easier to read
