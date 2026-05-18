@@ -1,3 +1,16 @@
+// Minimax AI for Tic-Tac-Toe.
+//
+// Conventions:
+//   - The board is a flat 9-element array; indices map to a 3×3 grid:
+//       0 | 1 | 2
+//       ---------
+//       3 | 4 | 5
+//       ---------
+//       6 | 7 | 8
+//   - "O" is the maximizing player (AI); "X" is the minimizing player (human).
+//   - Scores: O wins → positive, X wins → negative, draw → 0.
+//     The `depth` term makes the AI prefer faster wins and slower losses.
+
 export type Board = (string | null)[];
 
 const LINES = [
@@ -13,6 +26,7 @@ export function getWinner(board: Board): string | null {
   return null;
 }
 
+// Returns the winning line's indices so the UI can highlight them.
 export function getWinningLine(board: Board): number[] | null {
   for (const line of LINES) {
     const [a, b, c] = line;
@@ -25,13 +39,16 @@ export function isBoardFull(board: Board): boolean {
   return board.every((cell) => cell !== null);
 }
 
+// Terminal score from O's perspective.
 function score(board: Board, depth: number): number {
   const winner = getWinner(board);
-  if (winner === "O") return 10 - depth;
-  if (winner === "X") return depth - 10;
+  if (winner === "O") return 10 - depth; // prefer faster wins
+  if (winner === "X") return depth - 10; // prefer slower losses
   return 0;
 }
 
+// Standard minimax — O maximizes, X minimizes.
+// Mutates board in-place during recursion and restores it (no allocations).
 function minimax(board: Board, depth: number, isMaximizing: boolean): number {
   const winner = getWinner(board);
   if (winner || isBoardFull(board)) return score(board, depth);
@@ -59,6 +76,7 @@ function minimax(board: Board, depth: number, isMaximizing: boolean): number {
   }
 }
 
+// Returns the index of the best move for O, or -1 if the board is full.
 export function getBestMove(board: Board): number {
   let bestScore = -Infinity;
   let bestMove = -1;

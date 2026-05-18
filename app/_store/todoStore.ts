@@ -1,3 +1,12 @@
+// Zustand store for the Todo feature.
+//
+// Design decisions:
+//   - `persist` middleware syncs state to localStorage under the key "todos",
+//     so tasks survive page refreshes with zero extra code.
+//   - IDs are Date.now() timestamps — sufficient for a single-user local app.
+//   - editTodo with blank text acts as a delete so an empty inline-edit
+//     removes the item without needing a separate confirmation step.
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -35,6 +44,7 @@ export const useTodoStore = create<TodoStore>()(
           ),
         })),
 
+      // Saving blank text deletes the todo (mirrors the UX of clearing an inline edit).
       editTodo: (id, text) => {
         const trimmed = text.trim();
         if (!trimmed) {

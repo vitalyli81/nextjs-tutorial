@@ -1,5 +1,10 @@
 "use client";
 
+// TodoApp — root client component for the Todo feature.
+// Owns the new-todo input and delegates per-item actions to TodoItem.
+// All state lives in the Zustand store (todoStore.ts); this component only
+// holds the local input string.
+
 import { useState } from "react";
 import { useTodoStore } from "../../_store/todoStore";
 import TodoItem from "./TodoItem";
@@ -8,11 +13,12 @@ export default function TodoApp() {
   const { todos, addTodo } = useTodoStore();
   const [input, setInput] = useState("");
 
+  // Derived — not stored in state to stay in sync with the store automatically.
   const remaining = todos.filter((t) => !t.completed).length;
 
   function handleAdd() {
     addTodo(input);
-    setInput("");
+    setInput(""); // clear regardless; addTodo ignores blank strings internally
   }
 
   return (
@@ -20,6 +26,7 @@ export default function TodoApp() {
       <div className="w-full max-w-md bg-white dark:bg-zinc-800 rounded-2xl shadow-lg p-6">
         <h1 className="text-2xl font-bold text-zinc-800 dark:text-white mb-6">Todo List</h1>
 
+        {/* Add-todo row */}
         <div className="flex gap-2 mb-6">
           <input
             type="text"

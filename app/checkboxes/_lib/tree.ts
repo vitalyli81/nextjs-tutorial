@@ -1,3 +1,15 @@
+// Flat-tree data structure for the checkbox tree feature.
+//
+// Why flat instead of nested?
+//   Nested trees require recursion on every toggle/read. By flattening the
+//   tree once at build time and pre-computing `subtreeSize` and `childIds`,
+//   all runtime operations become O(subtree) for writes and O(1) for reads.
+//
+// CheckedCountMap design:
+//   Each node stores the count of its *checked descendants* (not itself).
+//   This lets isIndeterminate() check in O(1): count > 0 && count < subtreeSize.
+//   Updating the map after a toggle only touches ancestors — O(depth).
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -8,15 +20,13 @@ export type RawNode = {
   children?: RawNode[];
 };
 
-// FlatNode: what the UI works with.
-// `subtreeSize` = total number of descendants (not counting self).
-// Stored flat so we never recurse during interaction.
+// FlatNode: what the UI works with after buildFlatTree runs once.
 export type FlatNode = {
   id: string;
   label: string;
   parentId: string | null;
   depth: number;
-  subtreeSize: number;    // precomputed at build time
+  subtreeSize: number; // total number of descendants (not counting self)
   childIds: string[];
 };
 
@@ -44,8 +54,8 @@ export function buildFlatTree(roots: RawNode[]): { tree: FlatTree; rootIds: stri
 }
 
 // ---------------------------------------------------------------------------
-// checkedCount map  –  Map<id, number of checked descendants>
-// Maintained so indeterminate check is O(1): read checkedCount[id]
+// CheckedCountMap — Map<id, number of checked descendants>
+// Initialized to zero; maintained by toggle().
 // ---------------------------------------------------------------------------
 
 export type CheckedCountMap = Map<string, number>;
@@ -57,12 +67,15 @@ export function buildCheckedCountMap(tree: FlatTree): CheckedCountMap {
 }
 
 // ---------------------------------------------------------------------------
-// Toggle a node  –  O(depth), effectively O(1) for bounded trees
+// Toggle a node  –  O(subtree) for the checked set, O(depth) for the counts
 //
 // Rules:
-//   - Checking a node: marks it + all descendants checked.
-//   - Unchecking a node: marks it + all descendants unchecked.
-//   - After changing a subtree, walk ancestors and recompute their counts.
+//   - Checking:   marks the node + all descendants checked.
+//   - Unchecking: marks the node + all descendants unchecked.
+//   - After toggling, ancestor checkedCounts are adjusted by the net delta.
+//
+// Returns new immutable copies of checked and checkedCount so React can
+// detect the state change via reference equality.
 // ---------------------------------------------------------------------------
 
 export function toggle(
@@ -78,9 +91,7 @@ export function toggle(
   const wasChecked = nextChecked.has(nodeId);
   const willCheck = !wasChecked;
 
-  // Collect the node itself + all descendants via BFS  –  O(subtree)
-  // (This part is O(subtree size) which is correct — you must touch each node
-  //  being toggled. The indeterminate *read* is still O(1).)
+  // BFS to collect the node + all descendants — O(subtree size).
   const subtree: string[] = [];
   const queue = [nodeId];
   while (queue.length) {
@@ -89,7 +100,7 @@ export function toggle(
     for (const cid of tree.get(id)!.childIds) queue.push(cid);
   }
 
-  // How many items in this subtree are changing state?
+  // Apply the check/uncheck to every node in the subtree; track net change.
   let delta = 0;
   for (const id of subtree) {
     if (willCheck && !nextChecked.has(id)) {
@@ -101,20 +112,15 @@ export function toggle(
     }
   }
 
-  // Walk ancestors, adjusting their checkedCount  –  O(depth)
+  // Propagate the delta up the ancestor chain — O(depth).
   let cur: FlatNode | undefined = node;
   while (cur?.parentId) {
     const pid = cur.parentId;
     nextCount.set(pid, (nextCount.get(pid) ?? 0) + delta);
     cur = tree.get(pid);
   }
-  // The node's own checkedCount = number of checked descendants (not self)
-  // We need to update it too for nodes that have children
-  if (willCheck) {
-    nextCount.set(nodeId, node.subtreeSize);
-  } else {
-    nextCount.set(nodeId, 0);
-  }
+  // The toggled node's own count = number of checked descendants.
+  nextCount.set(nodeId, willCheck ? node.subtreeSize : 0);
 
   return { checked: nextChecked, checkedCount: nextCount };
 }
@@ -127,12 +133,16 @@ export function isChecked(id: string, checked: Set<string>): boolean {
   return checked.has(id);
 }
 
-// Indeterminate = node is not checked itself, but some descendants are checked.
-// OR node is checked but not all descendants are checked.
-// Simplified: some-but-not-all descendants checked, regardless of self.
-export function isIndeterminate(id: string, checked: Set<string>, checkedCount: CheckedCountMap, tree: FlatTree): boolean {
+// A node is indeterminate when some — but not all — of its descendants are checked.
+// Leaves can never be indeterminate (subtreeSize === 0).
+export function isIndeterminate(
+  id: string,
+  checked: Set<string>,
+  checkedCount: CheckedCountMap,
+  tree: FlatTree,
+): boolean {
   const node = tree.get(id)!;
-  if (node.subtreeSize === 0) return false; // leaf
+  if (node.subtreeSize === 0) return false; // leaf node
   const count = checkedCount.get(id) ?? 0;
   return count > 0 && count < node.subtreeSize;
 }
