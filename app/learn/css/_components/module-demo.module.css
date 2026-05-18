@@ -1,0 +1,48 @@
+/* module-demo.module.css — CSS Module demo styles.
+ *
+ * HOW THIS FILE WORKS:
+ *   Every class here is locally scoped — Next.js hashes the names at build time
+ *   (e.g. .card → ._card_abc12_1) so they can't collide with other stylesheets.
+ *
+ * USAGE IN COMPONENT:
+ *   import styles from "./module-demo.module.css";
+ *   <div className={styles.card}>          — single class
+ *   <div className={`${styles.card} ${styles.primary}`}> — combined
+ */
+
+.card {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 2px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+}
+
+.secondary {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
