@@ -431,3 +431,174 @@ export function FromRootDemo() {
     </div>
   );
 }
+
+// ── Demo 4: @slot parallel routes ────────────────────────────────────────────
+//
+// Shows a dashboard layout with two independent slots: @analytics and @team.
+// Each slot has its own loading state and can error independently.
+// Tabs let you switch which sub-page each slot is showing — the other stays put.
+
+type SlotPage = "overview" | "detail";
+
+interface SlotState {
+  analytics: SlotPage;
+  team: SlotPage;
+  loading: "analytics" | "team" | null;
+}
+
+export function SlotsDemo() {
+  const [slots, setSlots] = useState<SlotState>({
+    analytics: "overview",
+    team: "overview",
+    loading: null,
+  });
+
+  function navigate(slot: "analytics" | "team", page: SlotPage) {
+    setSlots(s => ({ ...s, loading: slot }));
+    setTimeout(() => {
+      setSlots(s => ({ ...s, [slot]: page, loading: null }));
+    }, 700);
+  }
+
+  return (
+    <div className="space-y-3">
+      {/* Layout shell */}
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+        {/* layout.tsx header */}
+        <div className="bg-zinc-50 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
+          <p className="text-xs font-mono text-zinc-400">dashboard/layout.tsx</p>
+          <p className="text-[10px] text-zinc-400">renders children + @analytics + @team</p>
+        </div>
+
+        {/* children slot */}
+        <div className="px-4 pt-3 pb-1">
+          <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">children (dashboard/page.tsx)</p>
+          <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700/50 px-3 py-2">
+            <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Dashboard</p>
+            <p className="text-xs text-zinc-400">Welcome back — here&apos;s your overview.</p>
+          </div>
+        </div>
+
+        {/* two slots side by side */}
+        <div className="grid sm:grid-cols-2 gap-3 p-3">
+
+          {/* @analytics slot */}
+          <div className="rounded-lg border border-blue-200 dark:border-blue-800 overflow-hidden">
+            <div className="bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 border-b border-blue-200 dark:border-blue-800 flex items-center justify-between">
+              <p className="text-[10px] font-semibold text-blue-500 uppercase tracking-wider">@analytics slot</p>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => navigate("analytics", "overview")}
+                  className={`text-[10px] px-2 py-0.5 rounded transition-colors ${slots.analytics === "overview" && slots.loading !== "analytics" ? "bg-blue-500 text-white" : "text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50"}`}
+                >overview</button>
+                <button
+                  onClick={() => navigate("analytics", "detail")}
+                  className={`text-[10px] px-2 py-0.5 rounded transition-colors ${slots.analytics === "detail" && slots.loading !== "analytics" ? "bg-blue-500 text-white" : "text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50"}`}
+                >detail</button>
+              </div>
+            </div>
+            <div className="p-3 min-h-[90px] flex items-center justify-center bg-white dark:bg-zinc-900">
+              {slots.loading === "analytics" ? (
+                <div className="w-full animate-pulse space-y-2">
+                  <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4" />
+                  <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2" />
+                  <p className="text-[10px] text-center text-zinc-400 pt-1">@analytics/loading.tsx</p>
+                </div>
+              ) : slots.analytics === "overview" ? (
+                <div className="w-full space-y-2">
+                  <p className="text-[10px] font-mono text-zinc-400">@analytics/page.tsx</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[["Revenue", "$12k"], ["Sessions", "2.1k"]].map(([k, v]) => (
+                      <div key={k} className="rounded bg-zinc-50 dark:bg-zinc-800 p-2 text-center">
+                        <p className="text-sm font-bold text-zinc-800 dark:text-white">{v}</p>
+                        <p className="text-[10px] text-zinc-400">{k}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full space-y-1.5">
+                  <p className="text-[10px] font-mono text-zinc-400">@analytics/detail/page.tsx</p>
+                  {[70, 85, 55, 90].map((w, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="h-2 rounded-full bg-blue-400" style={{ width: `${w}%` }} />
+                      <span className="text-[10px] text-zinc-400">{w}%</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* @team slot */}
+          <div className="rounded-lg border border-purple-200 dark:border-purple-800 overflow-hidden">
+            <div className="bg-purple-50 dark:bg-purple-900/30 px-3 py-1.5 border-b border-purple-200 dark:border-purple-800 flex items-center justify-between">
+              <p className="text-[10px] font-semibold text-purple-500 uppercase tracking-wider">@team slot</p>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => navigate("team", "overview")}
+                  className={`text-[10px] px-2 py-0.5 rounded transition-colors ${slots.team === "overview" && slots.loading !== "team" ? "bg-purple-500 text-white" : "text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50"}`}
+                >overview</button>
+                <button
+                  onClick={() => navigate("team", "detail")}
+                  className={`text-[10px] px-2 py-0.5 rounded transition-colors ${slots.team === "detail" && slots.loading !== "team" ? "bg-purple-500 text-white" : "text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50"}`}
+                >detail</button>
+              </div>
+            </div>
+            <div className="p-3 min-h-[90px] flex items-center justify-center bg-white dark:bg-zinc-900">
+              {slots.loading === "team" ? (
+                <div className="w-full animate-pulse space-y-2">
+                  <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4" />
+                  <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2" />
+                  <p className="text-[10px] text-center text-zinc-400 pt-1">@team/loading.tsx</p>
+                </div>
+              ) : slots.team === "overview" ? (
+                <div className="w-full space-y-1.5">
+                  <p className="text-[10px] font-mono text-zinc-400">@team/page.tsx</p>
+                  {["Alice", "Bob", "Carol"].map(name => (
+                    <div key={name} className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full bg-purple-200 dark:bg-purple-800 flex items-center justify-center text-[10px] font-bold text-purple-600 dark:text-purple-300">{name[0]}</div>
+                      <span className="text-xs text-zinc-600 dark:text-zinc-300">{name}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="w-full space-y-1.5">
+                  <p className="text-[10px] font-mono text-zinc-400">@team/detail/page.tsx</p>
+                  {[["Alice", "Admin", "12 PRs"], ["Bob", "Dev", "8 PRs"], ["Carol", "Design", "3 PRs"]].map(([n, r, s]) => (
+                    <div key={n} className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-700 dark:text-zinc-200 font-medium">{n}</span>
+                      <span className="text-zinc-400">{r}</span>
+                      <span className="text-purple-500">{s}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <p className="text-[10px] text-zinc-400 px-4 pb-3">
+          Switch tabs in either slot — the other slot is unaffected. Each slot streams and errors independently.
+        </p>
+      </div>
+
+      <FolderTree lines={[
+        "app/dashboard/",
+        "  layout.tsx         ← receives { children, analytics, team }",
+        "  page.tsx           → /dashboard  (the children slot)",
+        "  @analytics/",
+        "    page.tsx         ← overview tab",
+        "    detail/",
+        "      page.tsx       ← detail tab",
+        "    loading.tsx      ← shown while this slot fetches",
+        "  @team/",
+        "    page.tsx         ← overview tab",
+        "    detail/",
+        "      page.tsx       ← detail tab",
+        "    loading.tsx      ← shown while this slot fetches",
+        "    error.tsx        ← only crashes @team, not @analytics",
+      ]} />
+    </div>
+  );
+}

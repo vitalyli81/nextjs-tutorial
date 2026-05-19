@@ -55,10 +55,12 @@ const chapters = [
 ];
 
 const apps = [
-  { href: "/todo",        title: "Todo List",     emoji: "✅" },
-  { href: "/tictactoe",   title: "Tic-Tac-Toe",   emoji: "🎮" },
-  { href: "/feed",        title: "Infinite Feed",  emoji: "📜" },
-  { href: "/checkboxes",  title: "Checkbox Tree",  emoji: "☑️" },
+  { href: "/todo",               title: "Todo List",       emoji: "✅" },
+  { href: "/tictactoe",          title: "Tic-Tac-Toe",     emoji: "🎮" },
+  { href: "/feed",               title: "Infinite Feed",   emoji: "📜" },
+  { href: "/checkboxes",         title: "Checkbox Tree",   emoji: "☑️" },
+  { href: "/examples/slots",     title: "Parallel Slots",  emoji: "🪟" },
+  { href: "/examples/intercept", title: "Intercepted Routes", emoji: "🔀" },
 ];
 
 // ── Dropdown ─────────────────────────────────────────────────────────────

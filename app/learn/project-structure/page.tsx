@@ -21,7 +21,7 @@ import { Demo } from "../_components/Demo";
 import { Callout } from "../_components/Callout";
 import { CodeBlock } from "../_components/CodeBlock";
 import { CheatSheet } from "../_components/CheatSheet";
-import { SameLevelDemo, OneLevelUpDemo, FromRootDemo } from "./_components/InterceptDemo";
+import { SameLevelDemo, OneLevelUpDemo, FromRootDemo, SlotsDemo } from "./_components/InterceptDemo";
 
 export const metadata: Metadata = { title: "Project Structure" };
 
@@ -211,51 +211,16 @@ app/
       {/* ── Demo 6: Parallel routes ───────────────────────────────────── */}
       <Demo concept="Parallel routes  @slot" title="Render multiple pages simultaneously in one layout">
         <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 mb-1">
-          Parallel routes let a single layout render <strong>multiple independent pages at the same time</strong> —
-          each in its own named slot. Each slot can have its own loading, error, and
-          not-found states. Common for dashboards with independent panels or
-          split-view UIs.
+          Each slot (<code>@analytics</code>, <code>@team</code>) is an independent page rendered
+          by the same layout at the same time. Switch tabs in one slot — the other is unaffected.
+          Each slot has its own <code>loading.tsx</code> skeleton and <code>error.tsx</code> boundary.
         </p>
-        <CodeBlock>{`// Folder structure — @ prefix defines a slot
-app/dashboard/
-  layout.tsx          ← receives @analytics and @team as props
-  page.tsx            → /dashboard
-  @analytics/
-    page.tsx          ← rendered in the analytics slot
-    loading.tsx       ← independent loading state
-  @team/
-    page.tsx          ← rendered in the team slot
-    error.tsx         ← independent error boundary
-
-// layout.tsx — accept slots as props
-export default function DashboardLayout({
-  children,
-  analytics,
-  team,
-}: {
-  children:  React.ReactNode;
-  analytics: React.ReactNode;
-  team:      React.ReactNode;
-}) {
-  return (
-    <div>
-      <main>{children}</main>
-      <aside>
-        {analytics}
-        {team}
-      </aside>
-    </div>
-  );
-}
-
-// Each slot loads and streams independently.
-// An error in @team doesn't affect @analytics.`}
-        </CodeBlock>
+        <SlotsDemo />
         <Callout kind="tip">
           Slot folders (<code>@analytics</code>) are not URL segments — they don&apos;t
-          appear in the address bar. Use <code>default.tsx</code> in each slot as a
-          fallback when a user navigates directly to a URL that doesn&apos;t match
-          any active slot state.
+          appear in the address bar. Always add a <code>default.tsx</code> to each slot
+          so direct navigation doesn&apos;t crash when no active state matches.{" "}
+          <a href="/examples/slots" className="underline font-medium">See a live example with real @slot folders →</a>
         </Callout>
       </Demo>
 
@@ -291,7 +256,8 @@ export default function DashboardLayout({
           (parallel) holds the intercepted route, and the layout renders both the background
           page and the overlay at once. Always add a <code>default.tsx</code> that returns{" "}
           <code>null</code> to each slot — otherwise Next.js throws on direct navigation
-          when no intercepted state is active.
+          when no intercepted state is active.{" "}
+          <a href="/examples/intercept" className="underline font-medium">See a live example with real @modal + (.)photos folders →</a>
         </Callout>
       </Demo>
 

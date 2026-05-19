@@ -70,6 +70,20 @@ const apps = [
     emoji: "☑️",
     tags: ["Tree algorithms", "DOM refs"],
   },
+  {
+    href: "/examples/slots",
+    title: "Parallel Slots",
+    description: "Real @slot folders — two independent panels in one layout.",
+    emoji: "🪟",
+    tags: ["Parallel routes", "@slot"],
+  },
+  {
+    href: "/examples/intercept",
+    title: "Intercepted Routes",
+    description: "Real (.)photos intercept — click opens modal, refresh shows full page.",
+    emoji: "🔀",
+    tags: ["Intercepted routes", "@modal"],
+  },
 ];
 
 // Home page — Server Component (no "use client")
