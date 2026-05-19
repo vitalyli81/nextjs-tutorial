@@ -9,7 +9,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, use } from "react";
 
 const photos = [
   { id: 1, title: "Mountain sunrise",  emoji: "🏔️",  color: "bg-orange-100 dark:bg-orange-900/40", desc: "Golden light breaks over the peaks as the world wakes up." },
@@ -23,10 +23,11 @@ const photos = [
 export default function PhotoModal({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
-  const photo = photos.find(p => p.id === Number(params.id));
+  const { id } = use(params);
+  const photo = photos.find(p => p.id === Number(id));
 
   // Close on Escape
   useEffect(() => {
