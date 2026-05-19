@@ -209,55 +209,150 @@ app/
       </Demo>
 
       {/* ── Demo 6: Parallel routes ───────────────────────────────────── */}
-      <Demo concept="Parallel routes  @slot" title="Render multiple pages simultaneously in one layout">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 mb-1">
-          Each slot (<code>@analytics</code>, <code>@team</code>) is an independent page rendered
-          by the same layout at the same time. Switch tabs in one slot — the other is unaffected.
-          Each slot has its own <code>loading.tsx</code> skeleton and <code>error.tsx</code> boundary.
+      <Demo concept="Parallel routes  @slot" title="Render multiple independent pages in one layout simultaneously">
+
+        {/* What */}
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+          Normally a layout has one <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">children</code> prop — one page at a time.
+          Slots let a layout render <strong className="text-zinc-800 dark:text-zinc-100">multiple independent pages simultaneously</strong>, each in its own named region.
+          You create a slot by naming a folder with <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@</code> — Next.js passes it as a prop to the layout automatically.
         </p>
+
+        {/* Key behaviours */}
+        <div className="mt-3 rounded-lg border border-zinc-100 dark:border-zinc-800 divide-y divide-zinc-100 dark:divide-zinc-800 text-sm">
+          {[
+            ["Independent loading", <>Each slot has its own <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">loading.tsx</code> — switching a tab in <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@analytics</code> shows that slot&apos;s skeleton while <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@team</code> stays fully interactive.</>],
+            ["Independent errors",  <>Each slot has its own <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">error.tsx</code> — a crash in one slot doesn&apos;t affect the others.</>],
+            ["No URL segment",      <><code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@analytics</code> never appears in the URL — it&apos;s a layout concept only.</>],
+            ["default.tsx required", <>When a URL only matches one slot, the others need a <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">default.tsx</code> fallback — otherwise Next.js throws a 404.</>],
+          ].map(([label, desc]) => (
+            <div key={label as string} className="flex gap-3 px-3 py-2.5">
+              <span className="text-blue-500 font-bold shrink-0 mt-0.5">→</span>
+              <div><span className="font-medium text-zinc-800 dark:text-zinc-100">{label}</span>{" "}<span className="text-zinc-500 dark:text-zinc-400">{desc}</span></div>
+            </div>
+          ))}
+        </div>
+
+        {/* When to use */}
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-4 mb-1.5">When to use</p>
+        <ul className="text-sm text-zinc-500 dark:text-zinc-400 space-y-1 mb-4">
+          {[
+            "Dashboard with several independent panels (analytics, team, activity feed)",
+            "Split-pane UI — list on the left, detail on the right, each with its own loading state",
+            "Paired with intercepted routes to hold a modal overlay (see below)",
+          ].map(t => <li key={t} className="flex gap-2"><span className="text-blue-400 shrink-0">✓</span>{t}</li>)}
+        </ul>
+
+        {/* How the layout wires it */}
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">How the layout receives slots</p>
+        <CodeBlock>{`// dashboard/layout.tsx
+export default function Layout({ children, analytics, team }: {
+  children:  React.ReactNode;
+  analytics: React.ReactNode;   // ← injected from @analytics/page.tsx
+  team:      React.ReactNode;   // ← injected from @team/page.tsx
+}) {
+  return (
+    <div>
+      <main>{children}</main>   {/* dashboard/page.tsx */}
+      <aside>
+        {analytics}             {/* @analytics/page.tsx */}
+        {team}                  {/* @team/page.tsx */}
+      </aside>
+    </div>
+  );
+}`}
+        </CodeBlock>
+
+        {/* Live demo */}
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-4 mb-1.5">Try it — switch tabs in one slot, the other is unaffected</p>
         <SlotsDemo />
+
         <Callout kind="tip">
-          Slot folders (<code>@analytics</code>) are not URL segments — they don&apos;t
-          appear in the address bar. Always add a <code>default.tsx</code> to each slot
-          so direct navigation doesn&apos;t crash when no active state matches.{" "}
-          <a href="/examples/slots" className="underline font-medium">See a live example with real @slot folders →</a>
+          <a href="/examples/slots" className="underline font-medium">See the full example with real <code>@analytics</code> and <code>@team</code> folders in the file system →</a>
         </Callout>
       </Demo>
 
-      {/* ── Demo 7a: (.) same level ───────────────────────────────────── */}
-      <Demo concept="Intercepted routes  (.)" title="(.) — intercept a sibling route: photo grid → modal">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 mb-1">
-          Click a photo to open it as a modal — URL updates but the grid stays behind.
-          Then try <strong>Simulate refresh</strong> to see the same URL render as a full page instead.
+      {/* ── Demo 7: Intercepted routes ────────────────────────────────── */}
+      <Demo concept="Intercepted routes  (.)  (..)  (...)" title="Show a different route inside the current layout without navigating away">
+
+        {/* What */}
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+          Normally clicking a link replaces the current page. Intercepted routes let you{" "}
+          <strong className="text-zinc-800 dark:text-zinc-100">render a different route inside the current layout</strong> — the URL updates
+          but the page you came from stays visible. Refresh or open the URL directly and you get the normal full page. No interception.
+        </p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2">
+          This means <strong className="text-zinc-800 dark:text-zinc-100">one URL serves two purposes</strong>: a modal when navigated to in-app, a standalone page when opened directly.
+        </p>
+
+        {/* Key behaviours */}
+        <div className="mt-3 rounded-lg border border-zinc-100 dark:border-zinc-800 divide-y divide-zinc-100 dark:divide-zinc-800 text-sm">
+          {[
+            ["URL changes, page doesn't", <>Click a photo → URL becomes <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">/photos/1</code> but the grid stays visible behind the modal.</>],
+            ["Refresh shows the real page", <>Refresh <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">/photos/1</code> → no interception, renders <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">photos/[id]/page.tsx</code> as a full page.</>],
+            ["Two files, one URL", <><code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">photos/[id]/page.tsx</code> is the real page. <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@modal/(.)photos/[id]/page.tsx</code> is the modal version. Same URL, different render based on context.</>],
+            ["Always pair with a @slot", <>The intercepted content needs somewhere to render — a <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@modal</code> parallel slot in the layout holds it.</>],
+          ].map(([label, desc]) => (
+            <div key={label as string} className="flex gap-3 px-3 py-2.5">
+              <span className="text-blue-500 font-bold shrink-0 mt-0.5">→</span>
+              <div><span className="font-medium text-zinc-800 dark:text-zinc-100">{label}</span>{" "}<span className="text-zinc-500 dark:text-zinc-400">{desc}</span></div>
+            </div>
+          ))}
+        </div>
+
+        {/* When to use */}
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-4 mb-1.5">When to use</p>
+        <ul className="text-sm text-zinc-500 dark:text-zinc-400 space-y-1 mb-4">
+          {[
+            "Photo / video grid — click opens a modal, share link opens the full page",
+            "Social feed — quick-view drawer on click, full post page on direct URL",
+            "Login flow — modal from a CTA button, /login URL still works standalone",
+          ].map(t => <li key={t} className="flex gap-2"><span className="text-blue-400 shrink-0">✓</span>{t}</li>)}
+        </ul>
+
+        {/* Prefix reference */}
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">Choosing the right prefix</p>
+        <CodeBlock>{`// The prefix describes WHERE the target route lives
+// relative to the @slot folder — like a relative import path.
+//
+//  (.)folder    target is at the SAME level as the @slot folder
+//  (..)folder   target is ONE level ABOVE the @slot folder
+//  (...)folder  target is at the APP ROOT (any depth)
+//
+// Count folder levels, not URL segments.`}
+        </CodeBlock>
+
+        {/* Interactive demos */}
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-4 mb-1.5">
+          (.) — target is a sibling of @modal
+        </p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2">
+          Click a photo to intercept — URL updates, grid stays behind. Hit <strong className="text-zinc-700 dark:text-zinc-300">Simulate refresh</strong> to see the same URL as a full page.
         </p>
         <SameLevelDemo />
-      </Demo>
 
-      {/* ── Demo 7b: (..) one level up ────────────────────────────────── */}
-      <Demo concept="Intercepted routes  (..)" title="(..) — intercept a route one level up: feed → post modal">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 mb-1">
-          The <code>@modal</code> slot lives inside <code>feed/</code> but the target
-          is <code>posts/</code> one level up — so <code>(..)</code> is needed.
-          Click a post to see the intercept, then simulate a refresh.
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-5 mb-1.5">
+          (..) — target is one level above @modal
+        </p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2">
+          <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@modal</code> lives inside <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">feed/</code> but the target <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">posts/</code> is one level up — so <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">(..)</code> is needed.
         </p>
         <OneLevelUpDemo />
-      </Demo>
 
-      {/* ── Demo 7c: (...) from root ───────────────────────────────────── */}
-      <Demo concept="Intercepted routes  (...)" title="(...) — intercept from app root: dashboard → login modal">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 mb-1">
-          The <code>@modal</code> is deeply nested inside <code>dashboard/analytics/</code> but
-          the target <code>login/</code> is at the app root — so <code>(...)</code> is needed.
-          Click <strong>Switch account</strong> to see the intercept.
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-5 mb-1.5">
+          (...) — target is at the app root
+        </p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2">
+          <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">@modal</code> is deep inside <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">dashboard/analytics/</code> but the target <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">login/</code> is at the app root — so <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">(...)</code> is needed.
         </p>
         <FromRootDemo />
+
         <Callout kind="rule">
-          Parallel + intercepted routes always work together: the <code>@modal</code> slot
-          (parallel) holds the intercepted route, and the layout renders both the background
-          page and the overlay at once. Always add a <code>default.tsx</code> that returns{" "}
-          <code>null</code> to each slot — otherwise Next.js throws on direct navigation
-          when no intercepted state is active.{" "}
-          <a href="/examples/intercept" className="underline font-medium">See a live example with real @modal + (.)photos folders →</a>
+          Intercepted routes always need a <code>@slot</code> to render into — the layout renders both
+          the background page and the overlay simultaneously, no extra state needed.
+          Always add <code>default.tsx</code> returning <code>null</code> to the slot — otherwise
+          Next.js throws on direct navigation when no intercepted state is active.{" "}
+          <a href="/examples/intercept" className="underline font-medium">See the full example with real folder names →</a>
         </Callout>
       </Demo>
 
