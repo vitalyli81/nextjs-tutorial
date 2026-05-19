@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// CHAPTER 13 — TypeScript
+// CHAPTER 14 — TypeScript
 //
 // KEY CONCEPTS IN THIS FILE:
 //   • Primitive types      — string, number, boolean, null, undefined

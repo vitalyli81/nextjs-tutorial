@@ -24,6 +24,7 @@ import Link from "next/link";
 // Chapter cards data — title/description shown on the home page index
 // slug → /learn/[slug] (matches the folder name under app/learn/)
 const chapters = [
+  { slug: "project-structure",      title: "Project Structure",    description: "special files, route groups, parallel & intercepted routes" },
   { slug: "layouts-and-pages",      title: "Layouts & Pages",      description: "file-system routing, layout.tsx, dynamic segments" },
   { slug: "linking-and-navigating", title: "Linking & Navigating", description: "<Link>, useRouter, prefetching, active routes" },
   { slug: "server-and-client",      title: "Server & Client",      description: "'use client', props across the boundary, interleaving" },
@@ -36,6 +37,7 @@ const chapters = [
   { slug: "metadata",               title: "Metadata",             description: "static export, generateMetadata, title template" },
   { slug: "state-management",       title: "State Management",     description: "Zustand vs React Context, persist middleware, selectors" },
   { slug: "tailwind-css",           title: "Tailwind CSS",         description: "utilities, responsive, dark mode, clsx, config extension" },
+  { slug: "typescript",             title: "TypeScript",           description: "primitives, generics, utility types, React typing, narrowing" },
 ];
 
 // App examples data — 4 mini-apps demonstrating real-world Next.js patterns
@@ -87,7 +89,7 @@ export default function Home() {
         </h1>
         <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">
           Every App Router concept — explained with live interactive demos.
-          Ten chapters, four mini apps.
+          Fourteen chapters, four mini apps.
         </p>
         {/* CTAs — next/link for client-side navigation with prefetch */}
         <div className="flex flex-wrap gap-3 justify-center pt-2">
@@ -110,7 +112,7 @@ export default function Home() {
       {/* ── Learn section — chapter cards grid ─────────────────────── */}
       <section>
         <div className="mb-8">
-          <p className="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1">10 chapters</p>
+          <p className="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1">14 chapters</p>
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Learn</h2>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm">
             Interactive demos covering every topic in the official Next.js getting-started docs.
